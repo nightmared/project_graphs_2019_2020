@@ -83,7 +83,7 @@ struct
     let getscore edg = Edge.score (E.label edg);;
     let setscore value edg = Edge.setscore (E.label edg) value;;
     let components g = MyComp.scc_list g;;
-    let shortest_path g v1 v2 = MyDijk.shortest_path g v1 v2;;
+    let shortest_path g v1 v2 = try MyDijk.shortest_path g v1 v2 with Not_found -> ([],0);;
     let incrscore value edg = Edge.incr (E.label edg) value;;
     let getsrc edg = (E.src edg);;
     let getdst edg = (E.dst edg);;
