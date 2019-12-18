@@ -1,0 +1,11 @@
+(env
+  (dev
+    (flags (:standard -warn-error -A))))
+
+(library
+ (name lib)
+ (modules zach girvan nover convolution samplegraph)
+ (inline_tests)
+ (preprocess
+  (pps ppx_inline_test))
+ (libraries ocamlgraph))

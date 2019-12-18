@@ -38,7 +38,7 @@ Zach.add_edge_e g1 ed1_8;;
 Zach.add_edge_e g1 ed1_9;;
 Zach.add_edge_e g1 ed1_10;;
 
-Zach.dot_output g1 "graphs/g1.dot";;
+(*Zach.dot_output g1 "graphs/g1.dot";;*)
 
 (* Graph 2 : g2 *)
 let g2 = Zach.create ();;
@@ -72,7 +72,7 @@ Zach.add_edge_e g2 ed2_6;;
 Zach.add_edge_e g2 ed2_7;;
 Zach.add_edge_e g2 ed2_8;;
 
-Zach.dot_output g2 "graphs/g2.dot";;
+(*Zach.dot_output g2 "graphs/g2.dot";;*)
 
 (* Graph 3 : g3 *)
 let g3 = Zach.create ();;
@@ -124,7 +124,7 @@ Zach.add_edge_e g3 ed3_12;;
 Zach.add_edge_e g3 ed3_13;;
 Zach.add_edge_e g3 ed3_14;;
 
-Zach.dot_output g3 "graphs/g3.dot";;
+(*Zach.dot_output g3 "graphs/g3.dot";;*)
 
 (* Graph 4 : g4 *)
 let g4 = Zach.create ();;
@@ -154,5 +154,5 @@ Zach.add_edge_e g4 ed4_4;;
 Zach.add_edge_e g4 ed4_5;;
 Zach.add_edge_e g4 ed4_6;;
 
-Zach.dot_output g4 "graphs/g4.dot";;
+(*Zach.dot_output g4 "graphs/g4.dot";;*)
 
