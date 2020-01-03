@@ -44,12 +44,12 @@ let rec affiche_liste ~sep:sep f fmt =
 (* affiche le label d'un sommet v d'un graphe,                  *)
 (* suivi d'une chaine de formatage trm                          *)
 let affiche_sommet ?mark:(mark=false) ~trm:trm fmt v =
-  let (a, b, _) = V.label v in
+  let (a, _, _) = V.label v in
   if mark
   then
-	Format.fprintf fmt "v_(%i, %i) |-> %i%(%)" a b (Mark.get v) trm
+	Format.fprintf fmt "v_%i |-> %i%(%)" a(Mark.get v) trm
   else
-	Format.fprintf fmt "v_(%i, %i)%(%)" a b trm;;
+	Format.fprintf fmt "v_%i%(%)" a trm;;
 
 (* affiche_arete : (_,_,_,_,_,_) format6                        *)
 (*               -> Format.formatter -> E.t -> unit             *)
