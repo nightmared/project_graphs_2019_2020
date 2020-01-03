@@ -8,15 +8,6 @@ graph G {
   7 [shape=circle, color="#FF0000", label="7", ];
   
   
-  3 -- 2 [label="0.", ];
-  4 -- 2 [label="0.", ];
-  4 -- 3 [label="0.", ];
-  5 -- 1 [label="0.", ];
-  5 -- 3 [label="0.", ];
-  6 -- 2 [label="0.", ];
-  6 -- 3 [label="0.", ];
-  6 -- 4 [label="0.", ];
   7 -- 1 [label="0.", ];
-  7 -- 5 [label="0.", ];
   
   }

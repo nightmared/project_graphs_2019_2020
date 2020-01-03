@@ -17,7 +17,7 @@ let betweenness_score g =
 		| _ -> (e, 1)::acc
 		) [] sorted_edges_in_shortest_paths
 		(* supprime les doublons (encore un algo en O(n²)) *)
-	in List.fold_left
+	in let cleaned_results = List.fold_left
 		(fun acc e ->
 			(* si un élément est déjà présent, ne le rajoute pas *)
 			if List.length
@@ -25,9 +25,17 @@ let betweenness_score g =
 					(fun e2 -> let(a, _) = e2 in let (b, _) = e in if e <> e2 && is_same_edge a b then true else false)
 					acc)
 				> 0
-			then acc else e::acc)
-		[]
-		edges_with_numbers_list
+			then acc else e::acc
+		) [] edges_with_numbers_list
+	(* trie les arrêtes par indice décroissant *)
+	in List.sort (fun (_, i) (_, i2) -> if i == i2 then 0 else if i < i2 then 1 else -1) cleaned_results
 
-let girvan_newman g n_com = 
-	let b_score = betweenness_score g in ();;
+let rec girvan_newman g desired_n_com =
+	if List.length (components g) < desired_n_com then
+		match betweenness_score g with
+			| [] -> ()
+			| (e, _)::q ->
+					begin
+						remove_edge_e g e;
+						girvan_newman g desired_n_com
+					end
