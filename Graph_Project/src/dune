@@ -4,7 +4,7 @@
 
 (library
  (name lib)
- (modules zach girvan nover convolution samplegraph)
+ (modules zach girvan nover convolution samplegraph zachgraph)
  (inline_tests)
  (preprocess
   (pps ppx_inline_test))

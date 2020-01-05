@@ -295,4 +295,4 @@ Zach.add_edge_e karate ed76;;
 Zach.add_edge_e karate ed77;;
 Zach.add_edge_e karate ed78;;
 
-Zach.dot_output karate "graphs/karate.dot";;
+(* Zach.dot_output karate "graphs/karate.dot";; *)
