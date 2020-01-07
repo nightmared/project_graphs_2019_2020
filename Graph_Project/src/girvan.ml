@@ -4,11 +4,13 @@ let is_same_edge e1 e2 =
 	(E.dst e1 = E.dst e2 && E.src e1 = E.src e2)
 	|| (E.src e2 = E.dst e1 && E.dst e2 = E.src e1)
 
-let betweenness_score g =
+let betweenness_score_internal g vertex_list =
 	(* pour tous les noeuds, énumère le chemin le plus court vers les autres noeuds *)
-	let edges_in_shortest_paths = fold_vertex (fun v acc ->
-		(fold_vertex (fun v_dist acc -> if v != v_dist then (fst (shortest_path g v v_dist))@acc else acc) g [])@acc
-		) g []
+	let edges_in_shortest_paths =
+		List.fold_left
+			(fun acc v ->
+				(List.fold_left (fun acc v_dist -> if v != v_dist then (fst (shortest_path g v v_dist))@acc else acc) [] vertex_list)@acc
+			) [] vertex_list
 	(* trie cette liste par arrête *)
 	in let sorted_edges_in_shortest_paths = List.sort compare edges_in_shortest_paths
 	(* compte le nombre de fois où chaque arrête est présente *)
@@ -16,19 +18,24 @@ let betweenness_score g =
 		| (new_e, i)::q when is_same_edge e new_e -> (e, i+1)::q
 		| _ -> (e, 1)::acc
 		) [] sorted_edges_in_shortest_paths
-		(* supprime les doublons (encore un algo en O(n²)) *)
-	in let cleaned_results = List.fold_left
-		(fun acc e ->
-			(* si un élément est déjà présent, ne le rajoute pas *)
-			if List.length
-				(List.filter
-					(fun e2 -> let(a, _) = e2 in let (b, _) = e in if e <> e2 && is_same_edge a b then true else false)
-					acc)
-				> 0
-			then acc else e::acc
-		) [] edges_with_numbers_list
 	(* trie les arrêtes par indice décroissant *)
-	in List.sort (fun (_, i) (_, i2) -> if i == i2 then 0 else if i < i2 then 1 else -1) cleaned_results
+	in let ordered_list = List.sort (fun (_, i) (_, i2) -> compare i i2) edges_with_numbers_list
+	(* supprime les doublons *)
+	in List.fold_left
+		(fun acc (edge, value) ->
+			(* si un élément est déjà présent dans l'accumulateur, ne le rajoute pas *)
+			let elems_with_same_indices = List.filter (fun (_, value2) -> value = value2) acc
+			in if List.length
+				(List.filter
+					(fun (edge2, _) -> is_same_edge edge edge2)
+					elems_with_same_indices)
+				> 0
+			then acc else (edge, value)::acc
+		) [] ordered_list
+
+(* Run the betweenness_score algorithm across all components separately *)
+let betweenness_score g =
+	List.fold_left (fun acc e -> betweenness_score_internal g e@acc) [] (components g)
 
 let find_edge_in_betweenness_list l e = List.fold_left (fun acc (e_internal, value) -> if is_same_edge e_internal e then (e, value)::acc else acc) [] l
 let is_equal_betweenness_lists l1 l2 =
