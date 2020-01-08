@@ -1,21 +1,9 @@
 open Zach;;
 
-(* TODO : 
-    * Que vaut S_nover(v1,v2) dans le graphe :  v1 <--> v2
-    la formule donne 0/0...
-    * Dans la formule de la modularité faut il supposer i != j pour les noeuds de la communauté?
-    * Faut-il diviser la modularité par 2 m pour obtenir un nombre entre -1 et 1?
-*)
-
 (* 
-Réponse à la question 3.3
-La modularité est maximale à l'itération 2. 
-Le graphe présente 4 composantes connexes.
-Deux forment des communautés importantes (correspondant peu ou prou aux étiquettes correspondant au réel choix des membres)
-Les deux noeuds isolés (noeud 10 et 12) seront les personnes qui risque d'arrêter le karate
-Par exemple le noeud 10 est relié par un seul arc à la communauté des bleus et des rouges.
-Il a peu d'attache au club de karate et va être partagé entre suivre son ami 3 et son ami 34.
-Le noeud 12 connait seulement le neud 1.
+TODO answer :
+Do you observe a limitation using the NOVER approach on the karat7
+graph ? You can focus on a particular vertex to explain.
 *)
 
 module EnsembleSommet = Set.Make(Zach.V);;
@@ -30,8 +18,10 @@ let nover_score g =
         neighbours_v = of_list (succ g v) in
     let neighbours_both = inter neighbours_u neighbours_v and
         neighbours_at_least = diff (union neighbours_u neighbours_v) (of_list [u;v]) in
-    let score = float_of_int(cardinal neighbours_both)/.float_of_int(cardinal neighbours_at_least) in 
-    setscore score e
+    let score = 
+      if cardinal neighbours_both <> 0 then float_of_int(cardinal neighbours_both)/.float_of_int(cardinal neighbours_at_least)
+      else 0.
+    in setscore score e
   ) g
   )
   );;
@@ -120,14 +110,19 @@ let modularity_of_a_community g community =
 Zach.(
   List.fold_left (fun sum i  ->
     sum +. List.fold_left(fun sum_i j ->
-      let ratio = 
-        float_of_int((in_degree g i) * (in_degree g j)) /. float_of_int(2 * nb_edges g) and 
-      a_ij =
-        try
-          let _ = find_edge g i j in
-          1.0
-        with Not_found -> 0.0
-      in sum_i +. a_ij -. ratio
+      let coeff_ij = 
+        (if i = j then 
+          0.
+        else
+          let ratio = 
+            float_of_int((in_degree g i) * (in_degree g j)) /. float_of_int(2 * nb_edges g) and 
+          a_ij =
+            try
+              let _ = find_edge g i j in
+              1.0
+            with Not_found -> 0.0
+          in a_ij -. ratio)
+      in sum_i +. coeff_ij 
     )  0.0 community
   ) 0.0 community
 );;
@@ -136,7 +131,7 @@ let sum_float = List.fold_left (+.) 0.0;;
 
 let modularity g l = 
   let communities_modularity = List.map (modularity_of_a_community g) l in
-  sum_float communities_modularity /. (float_of_int (2 * Zach.nb_edges g))
+  sum_float communities_modularity
 ;;
 
 
@@ -181,71 +176,67 @@ let print_debug_graph g_original g_copie mapping msg path =
 
 (*
 let test_g1  = 
-  Zach.(Samplegraph.(
-    let g = Samplegraph.g1 in
-    let g_copie = Zach.copy g in
-    let mapping = map_vertex_between_graph g_copie g in
-    
-    let print_g = print_debug_graph g g_copie mapping in 
-    print_g "Iteration 0" "graphs/nover/g1-0.dot";
-    step_nover g_copie;
-    print_g "Iteration 1" "graphs/nover/g1-1.dot";
-    step_nover g_copie;
-    print_g "Iteration 2" "graphs/nover/g1-2.dot";
-  ));;
+  let g = Samplegraph.g1 in
+  let g_copie = Zach.copy g in
+  let mapping = map_vertex_between_graph g_copie g in
+
+  let print_g = print_debug_graph g g_copie mapping in 
+  print_g "g1 Iteration 0" "graphs/nover/g1-0.dot";
+  step_nover g_copie;
+  print_g "g1 Iteration 1" "graphs/nover/g1-1.dot";
+  step_nover g_copie;
+  print_g "g1 Iteration 2" "graphs/nover/g1-2.dot";
+  ;;
 
 let test_g2  = 
-  Zach.(Samplegraph.(
-    let g = Samplegraph.g2 in
-    let g_copie = Zach.copy g in
-    let mapping = map_vertex_between_graph g_copie g in
-    
-    let print_g = print_debug_graph g g_copie mapping in 
-    print_g "g2 Iteration 0" "graphs/nover/g2-0.dot";
-    step_nover g_copie;
-    print_g "g2 Iteration 1" "graphs/nover/g2-1.dot";
-    step_nover g_copie;
-    print_g "g2 Iteration 2" "graphs/nover/g2-2.dot";
-  ));;
+  let g = Samplegraph.g2 in
+  let g_copie = Zach.copy g in
+  let mapping = map_vertex_between_graph g_copie g in
+  
+  let print_g = print_debug_graph g g_copie mapping in 
+  print_g "g2 Iteration 0" "graphs/nover/g2-0.dot";
+  step_nover g_copie;
+  print_g "g2 Iteration 1" "graphs/nover/g2-1.dot";
+  step_nover g_copie;
+  print_g "g2 Iteration 2" "graphs/nover/g2-2.dot";
+  ;;
 
 
 let test_g3  = 
-  Zach.(Samplegraph.(
-    let g = Samplegraph.g3 in
-    let g_copie = Zach.copy g in
-    let mapping = map_vertex_between_graph g_copie g in
-    
-    let print_g = print_debug_graph g g_copie mapping in 
-    print_g "g3 Iteration 0" "graphs/nover/g3-0.dot";
-    step_nover g_copie;
-    print_g "g3 Iteration 1" "graphs/nover/g3-1.dot";
-    step_nover g_copie;
-    print_g "g3 Iteration 2" "graphs/nover/g3-2.dot";
-    step_nover g_copie;
-    print_g "g3 Iteration 3" "graphs/nover/g3-3.dot";
-    step_nover g_copie;
-    print_g "g3 Iteration 4" "graphs/nover/g3-4.dot";
-  ));;
+  let g = Samplegraph.g3 in
+  let g_copie = Zach.copy g in
+  let mapping = map_vertex_between_graph g_copie g in
+  
+  let print_g = print_debug_graph g g_copie mapping in 
+  print_g "g3 Iteration 0" "graphs/nover/g3-0.dot";
+  step_nover g_copie;
+  print_g "g3 Iteration 1" "graphs/nover/g3-1.dot";
+  step_nover g_copie;
+  print_g "g3 Iteration 2" "graphs/nover/g3-2.dot";
+  step_nover g_copie;
+  print_g "g3 Iteration 3" "graphs/nover/g3-3.dot";
+  step_nover g_copie;
+  print_g "g3 Iteration 4" "graphs/nover/g3-4.dot";
+  ;;
 
 
 let test_karat7  = 
-  Zach.(Samplegraph.(
-    let g_copie = Zach.copy Zachgraph.karate in
-    let mapping = map_vertex_between_graph g_copie Zachgraph.karate in
+  let g_copie = Zach.copy Zachgraph.karate in
+  let mapping = map_vertex_between_graph g_copie Zachgraph.karate in
 
-    let print_graph = print_debug_graph Zachgraph.karate g_copie mapping in 
-    print_graph "Modularite Karate Itération 0" "graphs/nover/karate-nover-0.dot";
+  let print_graph = print_debug_graph Zachgraph.karate g_copie mapping in 
+  print_graph "Modularite Karate Itération 0" "graphs/nover/karate-nover-0.dot";
 
-    step_nover g_copie;
+  step_nover g_copie;
 
-    print_graph "Modularite Karate Itération 1" "graphs/nover/karate-nover-1.dot";
+  print_graph "Modularite Karate Itération 1" "graphs/nover/karate-nover-1.dot";
 
-    step_nover g_copie;
+  step_nover g_copie;
 
-    print_graph "Modularite Karate Itération 2" "graphs/nover/karate-nover-2.dot";
+  print_graph "Modularite Karate Itération 2" "graphs/nover/karate-nover-2.dot";
 
-    step_nover g_copie;
+  step_nover g_copie;
 
-    print_graph "Modularite Karate Itération 3" "graphs/nover/karate-nover-3.dot";
-  ));;
+  print_graph "Modularite Karate Itération 3" "graphs/nover/karate-nover-3.dot";
+;;
 *)
