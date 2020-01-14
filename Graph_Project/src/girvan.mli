@@ -8,8 +8,7 @@
  * INDICATION: Change the community graph structure in place by updating the 
  * score parameter of its edges with (Zach.incrscore : float -> Zach.Zach.E.t -> unit).
  * *)
-val betweenness_score : Zach.Zach.t -> (Zach.Zach.MyGraph.E.t * int) list
-
+val betweenness_score : Zach.Zach.t -> unit
 (*
  * IN:  A community graph
  *      A number of community separation to reach

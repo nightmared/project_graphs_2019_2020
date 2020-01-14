@@ -56,9 +56,10 @@ let affiche_sommet ?mark:(mark=false) ~trm:trm fmt v =
 (* affiche les sommets d'une arete e d'un graphe,               *)
 (* suivi d'une chaine de formatage trm                          *)
 let affiche_arete ~trm:trm fmt e =
-  Format.fprintf fmt "%a -- %i -- > %a%(%)"
+  Format.fprintf fmt "%a -- (%i, %f) -- > %a%(%)"
   		 (affiche_sommet ~mark:false ~trm:"") (E.src e)
 		 (let (i, _) = E.label e in i)
+		 (let (_, v) = E.label e in !v)
 		 (affiche_sommet ~mark:false ~trm:"") (E.dst e)
 		 trm;;
 
